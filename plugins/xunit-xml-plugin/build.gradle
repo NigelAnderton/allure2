@@ -9,6 +9,7 @@ dependencies {
     testCompile('junit:junit')
     testCompile('org.assertj:assertj-core')
     testCompile('org.mockito:mockito-core')
+    compileOnly('org.projectlombok:lombok')
 }
 
 configurations.archives.artifacts.removeAll { it.archiveTask.is jar }

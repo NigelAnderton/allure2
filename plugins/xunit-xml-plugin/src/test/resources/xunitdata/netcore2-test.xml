@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<assemblies timestamp="12/03/2018 18:38:36">
+  <assembly name="Oauth2.Proxy.Net.Tests.dll" run-date="2018-12-03" run-time="18:38:36" total="5" passed="5" failed="0" skipped="0" time="0.089" errors="0">
+    <errors />
+    <collection total="4" passed="4" failed="0" skipped="0" name="Test collection for Oauth2.Proxy.Net.Tests.ProviderFactoryShould" time="0.068">
+      <test name="Oauth2.Proxy.Net.Tests.ProviderFactoryShould.FetchDefaultProviderCorrectly" type="Oauth2.Proxy.Net.Tests.ProviderFactoryShould" method="FetchDefaultProviderCorrectly" time="0.0650000" result="Pass">
+        <traits>
+          <trait name="Scenario" value="ProviderFactoryShould" />
+        </traits>
+      </test>
+      <test name="Oauth2.Proxy.Net.Tests.ProviderFactoryShould.FetchAuth0ProviderCorrectly" type="Oauth2.Proxy.Net.Tests.ProviderFactoryShould" method="FetchAuth0ProviderCorrectly" time="0.0010000" result="Pass">
+        <traits>
+          <trait name="Scenario" value="ProviderFactoryShould" />
+        </traits>
+      </test>
+      <test name="Oauth2.Proxy.Net.Tests.ProviderFactoryShould.FetchGoogleProviderCorrectly" type="Oauth2.Proxy.Net.Tests.ProviderFactoryShould" method="FetchGoogleProviderCorrectly" time="0.0010000" result="Pass">
+        <traits>
+          <trait name="Scenario" value="ProviderFactoryShould" />
+        </traits>
+      </test>
+      <test name="Oauth2.Proxy.Net.Tests.ProviderFactoryShould.FetchGoogleProviderCorrectlyWhenNameSetInLowercase" type="Oauth2.Proxy.Net.Tests.ProviderFactoryShould" method="FetchGoogleProviderCorrectlyWhenNameSetInLowercase" time="0.0010000" result="Pass">
+        <traits>
+          <trait name="Scenario" value="ProviderFactoryShould" />
+        </traits>
+      </test>
+    </collection>
+    <collection total="1" passed="1" failed="0" skipped="0" name="Test collection for Oauth2.Proxy.Net.Tests.ServiceConfigurationShould" time="0.021">
+      <test name="Oauth2.Proxy.Net.Tests.ServiceConfigurationShould.AddCorrectServices" type="Oauth2.Proxy.Net.Tests.ServiceConfigurationShould" method="AddCorrectServices" time="0.0210000" result="Pass">
+        <traits>
+          <trait name="Scenario" value="ServiceConfigurationShould" />
+        </traits>
+      </test>
+    </collection>
+  </assembly>
+</assemblies>

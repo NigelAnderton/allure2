@@ -9,6 +9,7 @@ import io.qameta.allure.entity.Status;
 import io.qameta.allure.entity.TestResult;
 import io.qameta.allure.entity.Time;
 import io.qameta.allure.parser.XmlElement;
+import io.qameta.allure.xunitxml.entity.RunStamp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -58,6 +59,8 @@ public class XunitXmlPlugin implements Reader {
     private static final String OUTPUT_ELEMENT_NAME = "output";
     private static final String TRAIT_ELEMENT_NAME = "trait";
     private static final String TRAITS_ELEMENT_NAME = "traits";
+    private static final String RUNDATE_ELEMENT_NAME = "run-date";
+    private static final String RUNTIME_ELEMENT_NAME = "run-time";
 
     private static final String FRAMEWORK_ATTRIBUTE_NAME = "test-framework";
     private static final String METHOD_ATTRIBUTE_NAME = "method";
@@ -98,18 +101,26 @@ public class XunitXmlPlugin implements Reader {
     private void parseAssembly(final XmlElement assemblyElement,
                                final RandomUidContext context, final ResultsVisitor visitor) {
         final String framework = getFramework(assemblyElement);
+
+        final RunStamp runStamp = RunStamp.create(
+            assemblyElement.getAttribute(RUNDATE_ELEMENT_NAME), 
+            assemblyElement.getAttribute(RUNTIME_ELEMENT_NAME)
+        );
+
         assemblyElement.get(COLLECTION_ELEMENT_NAME)
-                .forEach(element -> parseCollection(element, framework, context, visitor));
+                .forEach(element -> parseCollection(element, framework, context, visitor, runStamp));
     }
 
     private void parseCollection(final XmlElement collectionElement, final String framework,
-                                 final RandomUidContext context, final ResultsVisitor visitor) {
+                                 final RandomUidContext context, final ResultsVisitor visitor,
+                                 final RunStamp runStamp) {
         collectionElement.get(TEST_ELEMENT_NAME)
-                .forEach(element -> parseTest(element, framework, context, visitor));
+                .forEach(element -> parseTest(element, framework, context, visitor, runStamp));
     }
 
     private void parseTest(final XmlElement testElement, final String framework,
-                           final RandomUidContext context, final ResultsVisitor visitor) {
+                           final RandomUidContext context, final ResultsVisitor visitor,
+                           final RunStamp runStamp) {
         final Optional<String> fullName = Optional.ofNullable(testElement.getAttribute(NAME_ATTRIBUTE_NAME));
         final String className = testElement.getAttribute(TYPE_ATTRIBUTE_NAME);
         final String methodName = testElement.getAttribute(METHOD_ATTRIBUTE_NAME);
@@ -118,7 +129,7 @@ public class XunitXmlPlugin implements Reader {
         result.setUid(context.getValue().get());
         result.setName(methodName);
         result.setStatus(getStatus(testElement));
-        result.setTime(getTime(testElement));
+        result.setTime(getTime(testElement, runStamp));
 
         fullName.ifPresent(result::setFullName);
         fullName.ifPresent(result::setHistoryId);
@@ -194,13 +205,24 @@ public class XunitXmlPlugin implements Reader {
         return assemblyElement.getAttribute(FRAMEWORK_ATTRIBUTE_NAME);
     }
 
-    private Time getTime(final XmlElement testElement) {
+    private Time getTime(final XmlElement testElement, final RunStamp runStamp) {
         if (testElement.containsAttribute(TIME_ATTRIBUTE_NAME)) {
             try {
-                final long duration = BigDecimal.valueOf(testElement.getDoubleAttribute(TIME_ATTRIBUTE_NAME))
+                final Long duration = BigDecimal.valueOf(testElement.getDoubleAttribute(TIME_ATTRIBUTE_NAME))
                         .multiply(MULTIPLICAND)
-                        .longValue();
-                return new Time().setDuration(duration);
+                        .longValue();                    
+
+                final Time testTime = new Time().setDuration(duration);
+                if (!runStamp.hasValue()) {
+                    return testTime;
+                }
+
+                runStamp.setDuration(duration);
+                testTime.setStart(runStamp.getStart());
+                testTime.setStop(runStamp.getStop());
+                runStamp.reset();
+
+                return testTime;
             } catch (Exception e) {
                 LOGGER.debug("Could not parse time attribute for element test", e);
             }

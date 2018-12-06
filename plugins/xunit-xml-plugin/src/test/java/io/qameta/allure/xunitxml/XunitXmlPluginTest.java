@@ -83,7 +83,7 @@ public class XunitXmlPluginTest {
     }
 
     @Test
-    public void shouldSetTime() throws Exception {
+    public void shouldSetDuration() throws Exception {
         process(
                 "xunitdata/passed-test.xml",
                 "passed-test.xml"
@@ -98,6 +98,53 @@ public class XunitXmlPluginTest {
                 .extracting(Time::getDuration)
                 .containsExactlyInAnyOrder(44L);
     }
+
+    @Test
+    public void shouldSetStartTimes() throws Exception {
+        process(
+                "xunitdata/netcore2-test.xml",
+                "netcore2-test.xml"
+        );
+
+        final ArgumentCaptor<TestResult> captor = ArgumentCaptor.forClass(TestResult.class);
+        verify(visitor, times(5)).visitTestResult(captor.capture());
+
+        assertThat(captor.getAllValues())
+                .hasSize(5)
+                .extracting(TestResult::getTime)
+                .extracting(Time::getStart)
+                .containsExactlyInAnyOrder(
+                        1543862316065L,
+                        1543862316066L,
+                        1543862316067L,
+                        1543862316068L,
+                        1543862316000L
+                        );
+    }
+
+    @Test
+    public void shouldSetStopTimes() throws Exception {
+        process(
+                "xunitdata/netcore2-test.xml",
+                "netcore2-test.xml"
+        );
+
+        final ArgumentCaptor<TestResult> captor = ArgumentCaptor.forClass(TestResult.class);
+        verify(visitor, times(5)).visitTestResult(captor.capture());
+
+        assertThat(captor.getAllValues())
+                .hasSize(5)
+                .extracting(TestResult::getTime)
+                .extracting(Time::getStop)
+                .containsExactlyInAnyOrder(
+                        1543862316065L,
+                        1543862316066L,
+                        1543862316067L,
+                        1543862316068L,
+                        1543862316089L
+                        );
+    }
+
 
     @Test
     public void shouldSetLabels() throws Exception {
