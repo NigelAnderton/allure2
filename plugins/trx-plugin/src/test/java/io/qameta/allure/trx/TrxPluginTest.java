@@ -7,6 +7,7 @@ import io.qameta.allure.core.ResultsVisitor;
 import io.qameta.allure.entity.LabelName;
 import io.qameta.allure.entity.Status;
 import io.qameta.allure.entity.TestResult;
+import io.qameta.allure.entity.Time;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -123,6 +124,72 @@ public class TrxPluginTest {
                 .filteredOn(result -> result.getTestStage().getSteps().get(1).getName().contains("Given I have entered 50 into the calculator"))
                 .filteredOn(result -> result.getTestStage().getSteps().get(3).getName().contains("And I have entered -1 into the calculator"))
                 .hasSize(1);
+    }
+
+    @Test
+    public void shouldSetDurations() throws Exception {
+        process(
+                "trxdata/sample.trx",
+                "sample.trx"
+        );
+
+        final ArgumentCaptor<TestResult> captor = ArgumentCaptor.forClass(TestResult.class);
+        verify(visitor, times(4)).visitTestResult(captor.capture());
+
+        assertThat(captor.getAllValues())
+                .hasSize(4)
+                .extracting(TestResult::getTime)
+                .extracting(Time::getDuration)
+                .containsExactlyInAnyOrder(
+                    665L,
+                    32L,
+                    12L,
+                    52L
+                    );
+    }
+
+    @Test
+    public void shouldSetStartTimes() throws Exception {
+        process(
+                "trxdata/sample.trx",
+                "sample.trx"
+        );
+
+        final ArgumentCaptor<TestResult> captor = ArgumentCaptor.forClass(TestResult.class);
+        verify(visitor, times(4)).visitTestResult(captor.capture());
+
+        assertThat(captor.getAllValues())
+                .hasSize(4)
+                .extracting(TestResult::getTime)
+                .extracting(Time::getStart)
+                .containsExactlyInAnyOrder(
+                        1329661525272L,
+                        1329661525939L,
+                        1329661525979L,
+                        1329661525994L
+                        );
+    }
+
+    @Test
+    public void shouldSetStopTimes() throws Exception {
+        process(
+                "trxdata/sample.trx",
+                "sample.trx"
+        );
+
+        final ArgumentCaptor<TestResult> captor = ArgumentCaptor.forClass(TestResult.class);
+        verify(visitor, times(4)).visitTestResult(captor.capture());
+
+        assertThat(captor.getAllValues())
+                .hasSize(4)
+                .extracting(TestResult::getTime)
+                .extracting(Time::getStop)
+                .containsExactlyInAnyOrder(
+                        1329661525937L,
+                        1329661525971L,
+                        1329661525991L,
+                        1329661526046L
+                        );
     }
 
     private void process(String... strings) throws IOException {
